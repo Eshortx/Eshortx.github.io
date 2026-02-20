@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Player Viewer - GLE MOD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-red: #DA020E;
+      --dark-red: #B8001A;
+      --light-red: #FF1E2E;
+      --gold: #E8E8E8;
+      --dark-bg: #1a1a1a;
+      --darker-bg: #0f0f0f;
+      --text-light: #f5f5f5;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+      color: var(--text-light);
+      font-family: 'Rajdhani', sans-serif;
+      padding-top: 80px;
+      min-height: 100vh;
+    }
+
+    /* Navigation */
+    .navbar {
+      background: rgba(15, 15, 15, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--primary-red);
+      padding: 10px 0;
+    }
+
+    .navbar-brand img {
+      height: 50px;
+      transition: transform 0.3s ease;
+    }
+
+    .navbar-brand:hover img {
+      transform: scale(1.1);
+    }
+
+    .social-icons a {
+      color: var(--text-light);
+      font-size: 1.5rem;
+      transition: all 0.3s ease;
+      padding: 8px;
+      border-radius: 50%;
+      background: rgba(218, 2, 14, 0.1);
+      margin: 0 8px;
+    }
+
+    .social-icons a:hover {
+      color: var(--primary-red);
+      transform: translateY(-3px) scale(1.1);
+      background: rgba(218, 2, 14, 0.2);
+    }
+
+    .navbar-toggler {
+      border: 2px solid var(--primary-red);
+      background: transparent;
+    }
+
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28245, 245, 245, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='m4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+    .offcanvas {
+      background: var(--darker-bg);
+      border-left: 3px solid var(--primary-red);
+    }
+
+    .offcanvas-title {
+      color: var(--primary-red);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .btn-close {
+      filter: invert(1);
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 20px;
+    }
+
+    h1 {
+      color: var(--primary-red);
+      font-size: 3rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      margin-bottom: 2rem;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .search-container {
+      background: rgba(15, 15, 15, 0.9);
+      backdrop-filter: blur(10px);
+      border: 2px solid var(--primary-red);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(218, 2, 14, 0.2);
+    }
+
+    .search-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-field label {
+      font-weight: 700;
+      min-width: 80px;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9rem;
+    }
+
+    .search-field input {
+      padding: 10px 15px;
+      border: 2px solid var(--primary-red);
+      background: var(--darker-bg);
+      color: var(--text-light);
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    .search-field input:focus {
+      outline: none;
+      border-color: var(--light-red);
+      box-shadow: 0 0 15px rgba(218, 2, 14, 0.4);
+      transform: translateY(-2px);
+    }
+
+    button {
+      padding: 12px 25px;
+      border: none;
+      background: linear-gradient(45deg, var(--primary-red), var(--dark-red));
+      color: white;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    button:hover {
+      background: linear-gradient(45deg, var(--dark-red), var(--primary-red));
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(218, 2, 14, 0.4);
+    }
+
+    button:disabled {
+      background: #666;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .card {
+      background: linear-gradient(135deg, rgba(15, 15, 15, 0.9), rgba(26, 26, 26, 0.9));
+      backdrop-filter: blur(10px);
+      border: 2px solid var(--primary-red);
+      border-radius: 15px;
+      padding: 20px;
+      margin: 15px;
+      display: inline-block;
+      width: 250px;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-red), var(--gold), var(--primary-red));
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { opacity: 0.5; }
+      to { opacity: 1; }
+    }
+
+    .card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(218, 2, 14, 0.3);
+      border-color: var(--light-red);
+    }
+
+    .card img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid var(--gold);
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(218, 2, 14, 0.3);
+    }
+
+    .card:hover img {
+      transform: scale(1.1);
+      border-color: var(--primary-red);
+    }
+
+    .card div {
+      margin: 8px 0;
+      font-weight: 600;
+    }
+
+    .card div:first-of-type {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .card div:not(:first-of-type) {
+      color: var(--text-light);
+      font-size: 0.95rem;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .loading {
+      font-size: 1.5rem;
+      margin: 30px 0;
+      color: var(--primary-red);
+      font-weight: 700;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .stats {
+      margin: 20px 0;
+      font-size: 1.1rem;
+      color: var(--gold);
+      font-weight: 600;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 30px 0;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .pagination-info {
+      color: var(--gold);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0 20px;
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .page-btn {
+      padding: 8px 15px;
+      background: rgba(15, 15, 15, 0.9);
+      border: 2px solid var(--primary-red);
+      color: var(--text-light);
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      min-width: 40px;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: var(--primary-red);
+      transform: translateY(-2px);
+    }
+
+    .page-btn.active {
+      background: var(--primary-red);
+      color: white;
+    }
+
+    .page-btn:disabled {
+      background: #333;
+      border-color: #555;
+      color: #777;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .page-size-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .page-size-selector select {
+      padding: 8px 12px;
+      background: var(--darker-bg);
+      border: 2px solid var(--primary-red);
+      color: var(--text-light);
+      border-radius: 8px;
+      font-weight: 600;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        padding-top: 70px;
+      }
+
+      .navbar-brand img {
+        height: 40px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .search-container {
+        padding: 20px;
+        gap: 15px;
+      }
+      
+      .search-field {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .search-field input {
+        flex: 1;
+        margin-left: 10px;
+      }
+      
+      .card {
+        width: 220px;
+        margin: 10px;
+      }
+
+      .pagination-container {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .pagination-info {
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container-fluid d-flex justify-content-between align-items-center px-4">
+      <a class="navbar-brand" href="#home">
+        <img src="https://media.discordapp.net/attachments/1266731853155667998/1360726523937820723/main_icon_-_eshort.png?ex=68358414&is=68343294&hm=621a6481ae450a76fe9da1c0600f011eee8e5966aa5ee59ed303dc5e89b5dd0b&=&format=webp&quality=lossless" alt="GLE MOD Logo">
+      </a>
+      
+      <div class="social-icons d-none d-lg-flex">
+        <a href="https://www.youtube.com/@Eshortx/featured" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="https://discord.com/invite/YwH4zXcvaZ" target="_blank"><i class="fab fa-discord"></i></a>
+      </div>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Menu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+          <div class="social-icons d-lg-none text-center">
+            <a href="https://www.youtube.com/@Eshortx/featured" target="_blank"><i class="fab fa-youtube"></i></a>
+            <a href="https://discord.com/invite/YwH4zXcvaZ" target="_blank"><i class="fab fa-discord"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1>Player Viewer</h1>
+    
+    <div class="search-container">
+      <div class="search-field">
+        <label for="nameSearch">Name:</label>
+        <input type="text" id="nameSearch" placeholder="Search by name...">
+      </div>
+      <div class="search-field">
+        <label for="ratingMin">Rating:</label>
+        <input type="number" id="ratingMin" placeholder="Min" min="0" max="100" style="width: 60px;">
+        <span> - </span>
+        <input type="number" id="ratingMax" placeholder="Max" min="0" max="100" style="width: 60px;">
+      </div>
+      <div class="search-field">
+        <label for="potentialMin">Potential:</label>
+        <input type="number" id="potentialMin" placeholder="Min" min="0" max="100" style="width: 60px;">
+        <span> - </span>
+        <input type="number" id="potentialMax" placeholder="Max" min="0" max="100" style="width: 60px;">
+      </div>
+      <div class="search-field">
+        <label for="ageMin">Age:</label>
+        <input type="number" id="ageMin" placeholder="Min" min="0" max="50" style="width: 60px;">
+        <span> - </span>
+        <input type="number" id="ageMax" placeholder="Max" min="0" max="50" style="width: 60px;">
+      </div>
+      <button id="searchBtn">Search</button>
+      <button id="clearBtn">Clear</button>
+    </div>
+    
+    <div class="loading" id="loading" style="display: none;">Processing players...</div>
+    <div class="stats" id="stats"></div>
+    
+    <div class="pagination-container" id="paginationTop" style="display: none;">
+      <div class="page-size-selector">
+        <label>Show:</label>
+        <select id="pageSize">
+          <option value="50">50 per page</option>
+          <option value="100" selected>100 per page</option>
+          <option value="200">200 per page</option>
+        </select>
+      </div>
+      <div class="pagination-info" id="paginationInfo"></div>
+      <div class="pagination-controls" id="paginationControls"></div>
+    </div>
+    
+    <div class="container" id="output"></div>
+    
+    <div class="pagination-container" id="paginationBottom" style="display: none;">
+      <div class="pagination-info" id="paginationInfoBottom"></div>
+      <div class="pagination-controls" id="paginationControlsBottom"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Player data embedded directly
+    const playerData = `firstname	commonname	playerjerseyname	surname	playerid	overallrating	potential	birthdate	age	
+Marcos		Felipe	Felipe	400000	72	73	1996-04-13	29	Dênis
+Dênis		Júnior	Júnior	400001	67	72	1998-08-10	26	Gabriel
+Gabriel		Souza	Souza	400002	60	78	2004-08-03	20	Danilo
+Danilo		Fernandes	Fernandes	400003	60	60	1988-04-03	37	Santiago
+Santiago		Mingo	Mingo	400004	74	86	2001-11-21	23	Gabriel
+Gabriel		Xavier	Xavier	400005	73	83	2001-05-06	24	_
+_	Kanu	Kanu		400006	73	74	1997-03-07	28	David
+`;
+
+    let allPlayers = [];
+    let filteredPlayers = [];
+    let currentPage = 1;
+    let pageSize = 100;
+
+    window.addEventListener('load', function() {
+      const loadingDiv = document.getElementById('loading');
+      const statsDiv = document.getElementById('stats');
+      const outputDiv = document.getElementById('output');
+      
+      loadingDiv.style.display = 'block';
+      const startTime = performance.now();
+      
+      requestAnimationFrame(() => {
+        processPlayers(playerData, outputDiv, loadingDiv, statsDiv, startTime);
+      });
+
+      setupSearch();
+      setupPagination();
+    });
+
+    function setupSearch() {
+      const searchBtn = document.getElementById('searchBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const nameSearch = document.getElementById('nameSearch');
+
+      searchBtn.addEventListener('click', performSearch);
+      
+      clearBtn.addEventListener('click', function() {
+        document.getElementById('nameSearch').value = '';
+        document.getElementById('ratingMin').value = '';
+        document.getElementById('ratingMax').value = '';
+        document.getElementById('potentialMin').value = '';
+        document.getElementById('potentialMax').value = '';
+        document.getElementById('ageMin').value = '';
+        document.getElementById('ageMax').value = '';
+        filteredPlayers = [...allPlayers];
+        currentPage = 1;
+        displayCurrentPage();
+      });
+
+      nameSearch.addEventListener('input', performSearch);
+      
+      document.querySelectorAll('.search-field input').forEach(input => {
+        input.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            performSearch();
+          }
+        });
+      });
+    }
+
+    function setupPagination() {
+      const pageSize = document.getElementById('pageSize');
+      pageSize.addEventListener('change', function() {
+        pageSize = parseInt(this.value);
+        currentPage = 1;
+        displayCurrentPage();
+      });
+    }
+
+    function performSearch() {
+      const nameQuery = document.getElementById('nameSearch').value.toLowerCase().trim();
+      const ratingMin = parseInt(document.getElementById('ratingMin').value) || 0;
+      const ratingMax = parseInt(document.getElementById('ratingMax').value) || 100;
+      const potentialMin = parseInt(document.getElementById('potentialMin').value) || 0;
+      const potentialMax = parseInt(document.getElementById('potentialMax').value) || 100;
+      const ageMin = parseInt(document.getElementById('ageMin').value) || 0;
+      const ageMax = parseInt(document.getElementById('ageMax').value) || 100;
+
+      filteredPlayers = allPlayers.filter(player => {
+        const fullName = `${player.firstname} ${player.commonname} ${player.surname}`.toLowerCase();
+        const nameMatch = !nameQuery || fullName.includes(nameQuery);
+
+        const rating = parseInt(player.overallrating) || 0;
+        const ratingMatch = rating >= ratingMin && rating <= ratingMax;
+
+        const potential = parseInt(player.potential) || 0;
+        const potentialMatch = potential >= potentialMin && potential <= potentialMax;
+
+        const age = parseInt(player.age) || 0;
+        const ageMatch = age >= ageMin && age <= ageMax;
+
+        return nameMatch && ratingMatch && potentialMatch && ageMatch;
+      });
+
+      currentPage = 1;
+      displayCurrentPage();
+    }
+
+    function displayCurrentPage() {
+      pageSize = parseInt(document.getElementById('pageSize').value);
+      const totalPages = Math.ceil(filteredPlayers.length / pageSize);
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, filteredPlayers.length);
+      const currentPlayers = filteredPlayers.slice(startIndex, endIndex);
+
+      displayPlayers(currentPlayers);
+      
+      const statsDiv = document.getElementById('stats');
+      if (filteredPlayers.length === allPlayers.length) {
+        statsDiv.innerHTML = `Showing ${filteredPlayers.length} players`;
+      } else {
+        statsDiv.innerHTML = `Showing ${filteredPlayers.length} of ${allPlayers.length} players`;
+      }
+
+      const showPagination = filteredPlayers.length > 100;
+      document.getElementById('paginationTop').style.display = showPagination ? 'flex' : 'none';
+      document.getElementById('paginationBottom').style.display = showPagination ? 'flex' : 'none';
+
+      if (showPagination) {
+        updatePaginationControls(totalPages, startIndex + 1, endIndex);
+      }
+    }
+
+    function updatePaginationControls(totalPages, startIndex, endIndex) {
+      const paginationInfo = `Page ${currentPage} of ${totalPages} (${startIndex}-${endIndex} of ${filteredPlayers.length})`;
+      
+      document.getElementById('paginationInfo').textContent = paginationInfo;
+      document.getElementById('paginationInfoBottom').textContent = paginationInfo;
+
+      const controls = createPaginationControls(totalPages);
+      document.getElementById('paginationControls').innerHTML = controls;
+      document.getElementById('paginationControlsBottom').innerHTML = controls;
+
+      addPaginationListeners('paginationControls');
+      addPaginationListeners('paginationControlsBottom');
+    }
+
+    function createPaginationControls(totalPages) {
+      let controls = '';
+      
+      controls += `<button class="page-btn" data-page="prev" ${currentPage === 1 ? 'disabled' : ''}>
+                     <i class="fas fa-chevron-left"></i>
+                   </button>`;
+
+      let startPage = Math.max(1, currentPage - 3);
+      let endPage = Math.min(totalPages, startPage + 6);
+      
+      if (endPage - startPage < 6) {
+        startPage = Math.max(1, endPage - 6);
+      }
+
+      if (startPage > 1) {
+        controls += `<button class="page-btn" data-page="1">1</button>`;
+        if (startPage > 2) {
+          controls += '<span style="color: var(--gold); padding: 0 5px;">...</span>';
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        controls += `<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          controls += '<span style="color: var(--gold); padding: 0 5px;">...</span>';
+        }
+        controls += `<button class="page-btn" data-page="${totalPages}">${totalPages}</button>`;
+      }
+
+      controls += `<button class="page-btn" data-page="next" ${currentPage === totalPages ? 'disabled' : ''}>
+                     <i class="fas fa-chevron-right"></i>
+                   </button>`;
+
+      return controls;
+    }
+
+    function addPaginationListeners(containerId) {
+      const container = document.getElementById(containerId);
+      const buttons = container.querySelectorAll('.page-btn');
+      
+      buttons.forEach(button => {
+        button.addEventListener('click', function() {
+          if (this.disabled) return;
+          
+          const page = this.dataset.page;
+          const totalPages = Math.ceil(filteredPlayers.length / pageSize);
+          
+          if (page === 'prev') {
+            currentPage = Math.max(1, currentPage - 1);
+          } else if (page === 'next') {
+            currentPage = Math.min(totalPages, currentPage + 1);
+          } else {
+            currentPage = parseInt(page);
+          }
+          
+          displayCurrentPage();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+    }
+
+    function displayPlayers(players) {
+      const outputDiv = document.getElementById('output');
+      outputDiv.innerHTML = '';
+      
+      const fragment = document.createDocumentFragment();
+      
+      players.forEach(player => {
+        const card = createPlayerCard(player);
+        fragment.appendChild(card);
+      });
+      
+      outputDiv.appendChild(fragment);
+    }
+
+    function processPlayers(text, outputDiv, loadingDiv, statsDiv, startTime) {
+      const lines = text.split('\n');
+      const validPlayers = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        const parts = line.split('\t');
+        const playerid = parts[4];
+        
+        if (playerid && !isNaN(playerid)) {
+          validPlayers.push({
+            firstname: parts[0] || '',
+            commonname: parts[1] || '',
+            playerjerseyname: parts[2] || '',
+            surname: parts[3] || '',
+            playerid: playerid,
+            overallrating: parts[5] || '',
+            potential: parts[6] || '',
+            birthdate: parts[7] || '',
+            age: parts[8] || ''
+          });
+        }
+      }
+      
+      allPlayers = validPlayers;
+      filteredPlayers = [...allPlayers];
+      
+      displayCurrentPage();
+      
+      loadingDiv.style.display = 'none';
+      const endTime = performance.now();
+      const processingTime = (endTime - startTime).toFixed(2);
+      const initialStats = document.getElementById('stats').innerHTML;
+      document.getElementById('stats').innerHTML = `${initialStats} - Loaded in ${processingTime}ms`;
+    }
+
+    function createPlayerCard(player) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      
+      const displayName = player.commonname && player.commonname.trim() 
+        ? player.commonname 
+        : `${player.firstname} ${player.surname}`.trim();
+      
+      const imagePath = `GLE_files/p${player.playerid}.png`;
+      
+      card.innerHTML = `
+        <img src="${imagePath}" onerror="this.src='GLE_files/notfound_0.png'" loading="lazy">
+        <div><strong>${displayName}</strong></div>
+        <div>ID: ${player.playerid}</div>
+        <div>Overall: ${player.overallrating}</div>
+        <div>Potential: ${player.potential}</div>
+        <div>Birthdate: ${player.birthdate}</div>
+        <div>Age: ${player.age}</div>
+      `;
+      
+      return card;
+    }
+  </script>
+</body>
+</html>
