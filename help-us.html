@@ -479,6 +479,25 @@
     @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
     .step-nav { display:flex; justify-content:space-between; gap:1rem; margin-top:1.5rem; }
+    /* selectable cards */
+    .pick-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:.8rem; }
+    .pick-card {
+      position:relative; background:var(--dark-bg); border:2px solid #333; border-radius:12px;
+      padding:1.1rem 1rem; cursor:pointer; transition:all .2s; text-align:left;
+    }
+    .pick-card:hover { border-color:var(--light-red); transform:translateY(-2px); }
+    .pick-card.selected { border-color:var(--primary-red); background:rgba(218,2,14,.1); box-shadow:0 0 0 3px rgba(218,2,14,.18); }
+    .pick-card .pc-name { font-weight:700; color:#fff; word-break:break-word; }
+    .pick-card .pc-meta { font-size:.78rem; color:#888; margin-top:.3rem; }
+    .pick-card .pc-badge {
+      display:inline-block; margin-top:.5rem; font-size:.68rem; font-weight:600; padding:.15rem .5rem; border-radius:20px;
+    }
+    .pc-badge.done { background:rgba(34,197,94,.15); color:#8ef0ad; border:1px solid #22c55e; }
+    .pc-badge.need { background:rgba(255,215,0,.1); color:#ffe680; border:1px solid var(--gold); }
+    .pick-card .pc-check { position:absolute; top:.6rem; right:.6rem; width:22px; height:22px; border-radius:50%;
+      background:var(--primary-red); color:#fff; display:none; align-items:center; justify-content:center; font-size:.75rem; }
+    .pick-card.selected .pc-check { display:flex; }
+    .pick-empty { color:#888; padding:1.5rem; text-align:center; }
     .review-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem 1.5rem; }
     .review-grid .lbl { color:#888; font-size:.85rem; }
     .review-grid .val { color:#fff; font-weight:600; word-break:break-all; }
@@ -562,17 +581,10 @@
       <!-- STEP 1: League & Team -->
       <div class="step-pane active" data-step="1">
         <div class="card-block">
-          <h3>League &amp; Team</h3>
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label">League <span class="rq">*</span></label>
-              <input class="form-control" id="f-league" placeholder="e.g. Premier League">
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Team <span class="rq">*</span></label>
-              <input class="form-control" id="f-team" placeholder="e.g. Liverpool">
-            </div>
-          </div>
+          <h3>Select a League</h3>
+          <p style="color:#bbb;font-size:.9rem;margin-bottom:1rem">Choose the league you're submitting data for.</p>
+          <div class="pick-grid" id="league-grid"></div>
+          <input type="hidden" id="f-league">
           <div class="step-nav">
             <span></span>
             <button class="btn btn-primary" onclick="nextStep()">Continue &rarr;</button>
@@ -580,8 +592,22 @@
         </div>
       </div>
 
-      <!-- STEP 2: Team Data -->
+      <!-- STEP 2: Team -->
       <div class="step-pane" data-step="2">
+        <div class="card-block">
+          <h3>Select a Team</h3>
+          <p style="color:#bbb;font-size:.9rem;margin-bottom:1rem" id="team-sub">Pick a team from the selected league.</p>
+          <div class="pick-grid" id="team-grid"></div>
+          <input type="hidden" id="f-team">
+          <div class="step-nav">
+            <button class="btn btn-secondary" onclick="prevStep()">&larr; Back</button>
+            <button class="btn btn-primary" onclick="nextStep()">Continue &rarr;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Team Data -->
+      <div class="step-pane" data-step="3">
         <div class="card-block">
           <h3>Team Data <small style="color:#888;font-size:.8rem;font-weight:400">(required)</small></h3>
           <div class="row g-3">
@@ -618,7 +644,7 @@
       </div>
 
       <!-- STEP 3: Location -->
-      <div class="step-pane" data-step="3">
+      <div class="step-pane" data-step="4">
         <div class="card-block">
           <h3>Team Location <small style="color:#888;font-size:.8rem;font-weight:400">(required)</small></h3>
           <div class="row g-3">
@@ -640,7 +666,7 @@
       </div>
 
       <!-- STEP 4: Team Colors -->
-      <div class="step-pane" data-step="4">
+      <div class="step-pane" data-step="5">
         <div class="card-block">
           <h3>Team Colors <small style="color:#888;font-size:.8rem;font-weight:400">(required)</small></h3>
           <div class="row g-3">
@@ -665,7 +691,7 @@
       </div>
 
       <!-- STEP 5: League Data -->
-      <div class="step-pane" data-step="5">
+      <div class="step-pane" data-step="6">
         <div class="card-block">
           <h3>League Data <small style="color:#888;font-size:.8rem;font-weight:400">(required)</small></h3>
           <div class="row g-3">
@@ -694,7 +720,7 @@
       </div>
 
       <!-- STEP 6: Visual Assets -->
-      <div class="step-pane" data-step="6">
+      <div class="step-pane" data-step="7">
         <div class="card-block">
           <h3>Visual Assets <small style="color:#888;font-size:.8rem;font-weight:400">(optional)</small></h3>
           <p style="color:#bbb;font-size:.9rem;margin-bottom:1rem">
@@ -720,7 +746,7 @@
       </div>
 
       <!-- STEP 7: Review -->
-      <div class="step-pane" data-step="7">
+      <div class="step-pane" data-step="8">
         <div class="card-block">
           <h3>Review &amp; Submit</h3>
           <div id="review-box" class="review-grid"></div>
@@ -815,6 +841,7 @@
   let currentUser = null;
 
   async function init() {
+    await loadDB();
     const token = readTokenFromHash();
     if (token) {
       try {
@@ -920,24 +947,93 @@
   //  STEP NAVIGATION
   // ============================================================
   const STEPS = [
-    { n:1, label:"Team" },
-    { n:2, label:"Data" },
-    { n:3, label:"Location" },
-    { n:4, label:"Colors" },
-    { n:5, label:"League" },
-    { n:6, label:"Assets" },
-    { n:7, label:"Review" },
+    { n:1, label:"League" },
+    { n:2, label:"Team" },
+    { n:3, label:"Data" },
+    { n:4, label:"Location" },
+    { n:5, label:"Colors" },
+    { n:6, label:"League" },
+    { n:7, label:"Assets" },
+    { n:8, label:"Review" },
   ];
-  // required field ids per step (for per-step validation)
+  const TOTAL_STEPS = 8;
+  // required field ids per step (steps 1 & 2 validated by card selection instead)
   const STEP_FIELDS = {
-    1: ["f-league","f-team"],
-    2: ["f-stadium","f-budget","f-league-titles","f-domestic-cups","f-intl-cups","f-goal-record"],
-    3: ["f-lat","f-lng"],
-    4: [], // colors always have a value
-    5: ["f-league-goal"],
-    6: [], // assets optional
+    3: ["f-stadium","f-budget","f-league-titles","f-domestic-cups","f-intl-cups","f-goal-record"],
+    4: ["f-lat","f-lng"],
+    5: [], // colors always have a value
+    6: ["f-league-goal"],
+    7: [], // assets optional
   };
   let currentStep = 1;
+
+  // ---- data.json (leagues/teams) ----
+  const ASSET_LABELS = { banner:"Banner", scarf:"Scarf", adboard:"Adboard", flag:"Flag",
+    kit_home:"Home kit", kit_away:"Away kit", kit_gk:"GK kit", kit_extra:"Extra kit" };
+  let DB = { leagues: [] };
+  let selLeague = null, selTeam = null;
+
+  async function loadDB() {
+    try {
+      const r = await fetch("data.json", { cache: "no-cache" });
+      if (r.ok) DB = await r.json();
+    } catch (e) { /* file missing/local — leave empty */ }
+  }
+
+  function renderLeagues() {
+    const grid = document.getElementById("league-grid");
+    if (!DB.leagues || !DB.leagues.length) {
+      grid.innerHTML = `<div class="pick-empty">No leagues found. (Add them in data.json.)</div>`;
+      return;
+    }
+    grid.innerHTML = DB.leagues.map(l => {
+      const done = l.submitted;
+      const badge = done
+        ? `<span class="pc-badge done">✓ data submitted</span>`
+        : `<span class="pc-badge need">needs data</span>`;
+      return `<div class="pick-card ${selLeague&&selLeague.id===l.id?'selected':''}" onclick="pickLeague('${l.id}')">
+        <div class="pc-check">✓</div>
+        <div class="pc-name">${l.name}</div>
+        <div class="pc-meta">${(l.teams||[]).length} teams</div>
+        ${badge}
+      </div>`;
+    }).join("");
+  }
+
+  window.pickLeague = function(id) {
+    selLeague = DB.leagues.find(l => l.id === id) || null;
+    selTeam = null;
+    $("f-league").value = selLeague ? selLeague.name : "";
+    $("f-team").value = "";
+    renderLeagues();
+  };
+
+  function renderTeams() {
+    const grid = document.getElementById("team-grid");
+    const sub = document.getElementById("team-sub");
+    if (!selLeague) { grid.innerHTML = `<div class="pick-empty">Pick a league first.</div>`; return; }
+    sub.textContent = `Teams in ${selLeague.name}`;
+    const teams = selLeague.teams || [];
+    if (!teams.length) { grid.innerHTML = `<div class="pick-empty">No teams in this league yet.</div>`; return; }
+    grid.innerHTML = teams.map(t => {
+      const missing = t.missingAssets || [];
+      const badge = t.submitted && missing.length === 0
+        ? `<span class="pc-badge done">✓ complete</span>`
+        : `<span class="pc-badge need">${missing.length} asset(s) needed</span>`;
+      return `<div class="pick-card ${selTeam&&selTeam.id===t.id?'selected':''}" onclick="pickTeam('${t.id}')">
+        <div class="pc-check">✓</div>
+        <div class="pc-name">${t.name}</div>
+        ${badge}
+      </div>`;
+    }).join("");
+  }
+
+  window.pickTeam = function(id) {
+    if (!selLeague) return;
+    selTeam = (selLeague.teams || []).find(t => t.id === id) || null;
+    $("f-team").value = selTeam ? selTeam.name : "";
+    renderTeams();
+  };
 
   function renderStepper() {
     let html = "";
@@ -958,12 +1054,16 @@
     });
     currentStep = n;
     renderStepper();
-    if (n === 7) renderReview();
+    if (n === 1) renderLeagues();
+    if (n === 2) renderTeams();
+    if (n === TOTAL_STEPS) renderReview();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
   window.goToStep = showStep;
 
   function validateStep(n) {
+    if (n === 1) { if (!selLeague) { alert("Please select a league."); return ["League"]; } return []; }
+    if (n === 2) { if (!selTeam) { alert("Please select a team."); return ["Team"]; } return []; }
     const ids = STEP_FIELDS[n] || [];
     const missing = [];
     ids.forEach(id => {
@@ -972,16 +1072,13 @@
       el.classList.toggle("err", empty);
       if (empty) missing.push(el.previousElementSibling ? el.previousElementSibling.textContent.replace("*","").trim() : id);
     });
+    if (missing.length) alert("Please fill in: " + missing.join(", "));
     return missing;
   }
 
   window.nextStep = function() {
-    const miss = validateStep(currentStep);
-    if (miss.length) {
-      alert("Please fill in: " + miss.join(", "));
-      return;
-    }
-    if (currentStep < 7) showStep(currentStep + 1);
+    if (validateStep(currentStep).length) return;
+    if (currentStep < TOTAL_STEPS) showStep(currentStep + 1);
   };
   window.prevStep = function() {
     if (currentStep > 1) showStep(currentStep - 1);

@@ -1,0 +1,37 @@
+{
+  "_info": "GLE MOD database. The page reads this file to build the clickable league/team lists. The approval bot rewrites this file (via the GitHub API) when a submission is approved: it sets a team's 'submitted' flag, clears finished assets from 'missingAssets', and fills league data. Until the bot exists, you can edit this file by hand and commit it.",
+  "_version": 1,
+  "_assetKeys": ["banner", "scarf", "adboard", "flag", "kit_home", "kit_away", "kit_gk", "kit_extra"],
+  "leagues": [
+    {
+      "id": "placeholder-league-1",
+      "name": "Placeholder League 1",
+      "submitted": false,
+      "leagueData": { "color1": null, "color2": null, "color3": null, "goalRecord": null },
+      "teams": [
+        { "id": "team-1a", "name": "Placeholder Team A", "submitted": false, "missingAssets": ["banner", "scarf", "adboard", "flag", "kit_home", "kit_away", "kit_gk", "kit_extra"] },
+        { "id": "team-1b", "name": "Placeholder Team B", "submitted": false, "missingAssets": ["banner", "scarf", "adboard", "flag", "kit_home", "kit_away", "kit_gk", "kit_extra"] },
+        { "id": "team-1c", "name": "Placeholder Team C", "submitted": false, "missingAssets": ["banner", "scarf", "adboard", "flag", "kit_home", "kit_away", "kit_gk", "kit_extra"] }
+      ]
+    },
+    {
+      "id": "placeholder-league-2",
+      "name": "Placeholder League 2",
+      "submitted": false,
+      "leagueData": { "color1": null, "color2": null, "color3": null, "goalRecord": null },
+      "teams": [
+        { "id": "team-2a", "name": "Placeholder Team D", "submitted": false, "missingAssets": ["banner", "scarf", "adboard", "flag", "kit_home", "kit_away", "kit_gk", "kit_extra"] },
+        { "id": "team-2b", "name": "Placeholder Team E", "submitted": false, "missingAssets": ["banner", "scarf", "adboard", "flag", "kit_home", "kit_away", "kit_gk", "kit_extra"] }
+      ]
+    },
+    {
+      "id": "placeholder-league-3",
+      "name": "Placeholder League 3",
+      "submitted": false,
+      "leagueData": { "color1": null, "color2": null, "color3": null, "goalRecord": null },
+      "teams": [
+        { "id": "team-3a", "name": "Placeholder Team F", "submitted": false, "missingAssets": ["banner", "scarf", "adboard", "flag", "kit_home", "kit_away", "kit_gk", "kit_extra"] }
+      ]
+    }
+  ]
+}
