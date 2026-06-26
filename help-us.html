@@ -534,7 +534,7 @@
         <div class="drop-zone" id="drop-zone">
           <i class="fas fa-cloud-arrow-up"></i>
           <p><strong>Click to choose files</strong> or drag &amp; drop</p>
-          <small>Max 8 MB per file (Discord limit)</small>
+          <small>Any size welcome — large files are split automatically</small>
           <input type="file" id="file-input" multiple>
         </div>
         <div id="file-list"></div>
@@ -661,7 +661,10 @@
   //  FILE UPLOAD  (sent through the Cloudflare Worker relay)
   // ============================================================
   let files = [];
-  const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
+  // Files larger than this are automatically split into chunks before upload.
+  // 7.5 MB keeps each chunk safely under Discord's 8 MB webhook limit (room for overhead).
+  const CHUNK_BYTES = 7.5 * 1024 * 1024;
+  const HARD_MAX    = 500 * 1024 * 1024; // absolute sanity cap per file (500 MB)
 
   const dz = $("drop-zone"), fi = $("file-input");
   dz.addEventListener("click", () => fi.click());
@@ -675,8 +678,8 @@
 
   function addFiles(list) {
     for (const f of list) {
-      if (f.size > MAX_BYTES) {
-        setStatus("upload-status", "err", `"${f.name}" is over 8 MB and was skipped.`);
+      if (f.size > HARD_MAX) {
+        setStatus("upload-status", "err", `"${f.name}" is over 500 MB and was skipped.`);
         continue;
       }
       files.push(f);
@@ -685,13 +688,27 @@
     renderFiles();
   }
 
+  function chunkCount(size) { return Math.max(1, Math.ceil(size / CHUNK_BYTES)); }
+
+  // 6-char random code, e.g. "K7P2Q9" — shared by every chunk of one file
+  function makeCode() {
+    const c = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let s = "";
+    for (let i = 0; i < 6; i++) s += c[Math.floor(Math.random() * c.length)];
+    return s;
+  }
+
   function renderFiles() {
     const wrap = $("file-list");
     wrap.innerHTML = "";
     files.forEach((f, i) => {
+      const parts = chunkCount(f.size);
+      const splitTag = parts > 1
+        ? ` <small style="color:var(--gold)">— will split into ${parts} parts</small>`
+        : "";
       const row = document.createElement("div");
       row.className = "file-row";
-      row.innerHTML = `<span class="fname"><i class="fas fa-file" style="color:var(--gold);margin-right:.5rem"></i>${f.name} <small style="color:#888">(${(f.size/1024/1024).toFixed(2)} MB)</small></span>`;
+      row.innerHTML = `<span class="fname"><i class="fas fa-file" style="color:var(--gold);margin-right:.5rem"></i>${f.name} <small style="color:#888">(${(f.size/1024/1024).toFixed(2)} MB)</small>${splitTag}</span>`;
       const btn = document.createElement("button");
       btn.className = "remove"; btn.innerHTML = "&times;";
       btn.onclick = () => { files.splice(i,1); renderFiles(); };
@@ -716,31 +733,67 @@
     }
 
     $("submit-btn").disabled = true;
-    setStatus("upload-status","info","Uploading…");
 
     const note = $("note").value.trim();
     const who = currentUser.display || displayName(currentUser);
-    const header = `**New submission**\nFrom: **${who}** (ID: \`${currentUser.id}\`)` + (note ? `\nNote: ${note}` : "");
+
+    // Post one Discord message carrying a single attachment.
+    async function postOne(filename, blob, caption) {
+      const fd = new FormData();
+      fd.append("payload_json", JSON.stringify({
+        content: caption,
+        username: "GLE MOD Uploads"
+      }));
+      fd.append("files[0]", blob, filename);
+      const r = await fetch(WORKER_URL, { method: "POST", body: fd });
+      if (!r.ok) throw new Error("Server returned " + r.status);
+      // gentle spacing so the Discord webhook isn't rate-limited
+      await new Promise(res => setTimeout(res, 600));
+    }
 
     try {
-      // one request per file (each Discord message carries its files)
-      let first = true;
-      for (let i = 0; i < files.length; i += 10) {
-        const batch = files.slice(i, i + 10);
-        const fd = new FormData();
-        fd.append("payload_json", JSON.stringify({
-          content: first ? header : `(more files from **${who}**)`,
-          username: "GLE MOD Uploads"
-        }));
-        batch.forEach((f, j) => fd.append("files[" + j + "]", f, f.name));
-        const r = await fetch(WORKER_URL, { method: "POST", body: fd });
-        if (!r.ok) throw new Error("Server returned " + r.status);
-        first = false;
+      const codes = []; // collect codes of any split files to show the user
+
+      for (const f of files) {
+        const parts = chunkCount(f.size);
+
+        if (parts === 1) {
+          // small file — send whole, like before
+          const cap = `**New submission**\nFrom: **${who}** (ID: \`${currentUser.id}\`)`
+                    + (note ? `\nNote: ${note}` : "")
+                    + `\nFile: \`${f.name}\``;
+          setStatus("upload-status","info",`Uploading "${f.name}"…`);
+          await postOne(f.name, f, cap);
+        } else {
+          // big file — split into chunks tagged with one shared code
+          const code = makeCode();
+          codes.push({ name: f.name, code, parts });
+          for (let p = 0; p < parts; p++) {
+            const start = p * CHUNK_BYTES;
+            const blob = f.slice(start, start + CHUNK_BYTES);
+            // filename encodes everything the merge tool needs:
+            // CODE__part{N}-of-{M}__originalfilename
+            const chunkName = `${code}__part${p + 1}-of-${parts}__${f.name}`;
+            const cap = (p === 0)
+              ? `**New submission (SPLIT FILE)**\nFrom: **${who}** (ID: \`${currentUser.id}\`)`
+                + (note ? `\nNote: ${note}` : "")
+                + `\nFile: \`${f.name}\` — split into **${parts}** parts\nMerge code: \`${code}\``
+              : `\`${code}\` — part ${p + 1} of ${parts} — \`${f.name}\``;
+            setStatus("upload-status","info",`Uploading "${f.name}" — part ${p + 1} of ${parts}…`);
+            await postOne(chunkName, blob, cap);
+          }
+        }
       }
+
       files = [];
       renderFiles();
       $("note").value = "";
-      setStatus("upload-status","ok","✅ Thank you! Your files were submitted. We'll reach out on Discord if we need anything.");
+      let okMsg = "✅ Thank you! Your files were submitted.";
+      if (codes.length) {
+        okMsg += " Large files were split automatically — the team will reassemble them. (No action needed from you.)";
+      }
+      okMsg += " We'll reach out on Discord if we need anything.";
+      setStatus("upload-status","ok", okMsg);
     } catch (e) {
       setStatus("upload-status","err","Upload failed: " + e.message + ". Please try again or contact us on Discord.");
       $("submit-btn").disabled = false;
