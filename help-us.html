@@ -631,10 +631,6 @@
               <label class="form-label">International cups won <span class="rq">*</span></label>
               <input class="form-control" type="number" min="0" id="f-intl-cups" placeholder="0">
             </div>
-            <div class="col-md-6">
-              <label class="form-label">Goal-scoring record <span class="rq">*</span></label>
-              <input class="form-control" type="number" min="0" id="f-goal-record" placeholder="e.g. 36">
-            </div>
           </div>
           <div class="step-nav">
             <button class="btn btn-secondary" onclick="prevStep()">&larr; Back</button>
@@ -959,7 +955,7 @@
   const TOTAL_STEPS = 8;
   // required field ids per step (steps 1 & 2 validated by card selection instead)
   const STEP_FIELDS = {
-    3: ["f-stadium","f-budget","f-league-titles","f-domestic-cups","f-intl-cups","f-goal-record"],
+    3: ["f-stadium","f-budget","f-league-titles","f-domestic-cups","f-intl-cups"],
     4: ["f-lat","f-lng"],
     5: [], // colors always have a value
     6: ["f-league-goal"],
@@ -1017,9 +1013,16 @@
     if (!teams.length) { grid.innerHTML = `<div class="pick-empty">No teams in this league yet.</div>`; return; }
     grid.innerHTML = teams.map(t => {
       const missing = t.missingAssets || [];
-      const badge = t.submitted && missing.length === 0
-        ? `<span class="pc-badge done">✓ complete</span>`
-        : `<span class="pc-badge need">${missing.length} asset(s) needed</span>`;
+      const dataDone = !!t.submitted;
+      let badge;
+      if (dataDone && missing.length === 0) {
+        badge = `<span class="pc-badge done">✓ complete</span>`;
+      } else if (dataDone && missing.length > 0) {
+        // data approved, but some asset images still missing
+        badge = `<span class="pc-badge done">✓ data done</span> <span class="pc-badge need">${missing.length} asset(s) needed</span>`;
+      } else {
+        badge = `<span class="pc-badge need">needs data</span>`;
+      }
       return `<div class="pick-card ${selTeam&&selTeam.id===t.id?'selected':''}" onclick="pickTeam('${t.id}')">
         <div class="pc-check">✓</div>
         <div class="pc-name">${t.name}</div>
@@ -1091,7 +1094,7 @@
       ["League", d.league], ["Team", d.team],
       ["Stadium", d.teamData.stadium], ["Budget", "£" + d.teamData.budgetMillions + "M"],
       ["League titles", d.teamData.leagueTitles], ["Domestic cups", d.teamData.domesticCups],
-      ["International cups", d.teamData.intlCups], ["Goal record", d.teamData.goalRecord],
+      ["International cups", d.teamData.intlCups],
       ["Location", d.location.lat + ", " + d.location.lng],
       ["Team colors", sw(d.teamColors.primary)+" "+sw(d.teamColors.secondary)+" "+sw(d.teamColors.third)],
       ["League colors", sw(d.leagueData.color1)+" "+sw(d.leagueData.color2)+" "+sw(d.leagueData.color3)],
@@ -1108,7 +1111,7 @@
     "f-league":"League", "f-team":"Team",
     "f-stadium":"Stadium name", "f-budget":"Team budget",
     "f-league-titles":"League titles", "f-domestic-cups":"Domestic cups",
-    "f-intl-cups":"International cups", "f-goal-record":"Goal-scoring record",
+    "f-intl-cups":"International cups",
     "f-lat":"Latitude", "f-lng":"Longitude", "f-league-goal":"League goal record"
   };
 
@@ -1140,8 +1143,7 @@
         budgetMillions: num("f-budget"),
         leagueTitles: num("f-league-titles"),
         domesticCups: num("f-domestic-cups"),
-        intlCups: num("f-intl-cups"),
-        goalRecord: num("f-goal-record")
+        intlCups: num("f-intl-cups")
       },
       location: { lat: num("f-lat"), lng: num("f-lng") },
       teamColors: { primary: $("f-c1").value, secondary: $("f-c2").value, third: $("f-c3").value },
@@ -1164,7 +1166,6 @@
       `• Stadium: ${d.teamData.stadium}`,
       `• Budget: £${d.teamData.budgetMillions}M`,
       `• Titles: ${d.teamData.leagueTitles} league / ${d.teamData.domesticCups} domestic / ${d.teamData.intlCups} intl`,
-      `• Goal record: ${d.teamData.goalRecord}`,
       `• Location: ${d.location.lat}, ${d.location.lng}`,
       `• Team colors: ${c.primary} ${c.secondary} ${c.third}`,
       `• League colors: ${l.color1} ${l.color2} ${l.color3} · league goal record ${l.goalRecord}`,
