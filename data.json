@@ -121,7 +121,7 @@
         "color1": "#3d195b",
         "color2": "#00ff87",
         "color3": "#ffffff",
-        "goalRecord": 2
+        "goalRecord": 3
       },
       "teams": [
         {
@@ -139,11 +139,11 @@
             "kit_extra"
           ],
           "data": {
-            "stadium": "y",
-            "budgetMillions": 1,
-            "leagueTitles": 1,
-            "domesticCups": 1,
-            "intlCups": 2,
+            "stadium": "yujk",
+            "budgetMillions": 3,
+            "leagueTitles": 4,
+            "domesticCups": 5,
+            "intlCups": 4,
             "colors": {
               "primary": "#c8102e",
               "secondary": "#00b2a9",
@@ -151,13 +151,13 @@
             },
             "location": {
               "lat": 2,
-              "lng": 3
+              "lng": 4
             }
           },
           "lastApproved": {
             "by": "eshortx",
             "discordId": "977509926391930920",
-            "at": "2026-06-26T18:05:03.386Z"
+            "at": "2026-06-26T18:06:56.453Z"
           }
         }
       ]
