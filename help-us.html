@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GLE MOD &mdash; Help Us</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Global Styles */
+    :root {
+      --primary-red: #DA020E;
+      --dark-red: #B8001A;
+      --light-red: #FF1E2E;
+      --gold: #FFD700;
+      --dark-bg: #1a1a1a;
+      --darker-bg: #0f0f0f;
+      --text-light: #f5f5f5;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--dark-bg);
+      color: var(--text-light);
+      font-family: 'Rajdhani', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Navigation */
+    .navbar {
+      background: rgba(26, 26, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--primary-red);
+      transition: all 0.3s ease;
+    }
+
+    .navbar-brand img {
+      height: 50px;
+      transition: transform 0.3s ease;
+    }
+
+    .navbar-brand:hover img {
+      transform: scale(1.05);
+    }
+
+    .nav-link {
+      color: var(--text-light) !important;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--primary-red) !important;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: var(--primary-red);
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      width: 100%;
+    }
+
+    .social-icons a {
+      color: var(--text-light);
+      font-size: 1.2rem;
+      margin: 0 10px;
+      transition: all 0.3s ease;
+    }
+
+    .social-icons a:hover {
+      color: var(--primary-red);
+      transform: translateY(-2px);
+    }
+
+    .login-button {
+      background: linear-gradient(45deg, var(--primary-red), var(--dark-red));
+      color: white !important;
+      padding: 8px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .login-button:hover {
+      background: transparent;
+      border-color: var(--primary-red);
+      color: var(--primary-red) !important;
+      transform: translateY(-2px);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .hero-section img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-section::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(218, 2, 14, 0.3);
+    }
+
+    .hero-section .caption {
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      transform: translateY(-50%);
+      z-index: 10;
+      max-width: 500px;
+    }
+
+    .hero-section .caption h2 {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .hero-section .caption p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: var(--text-light);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+
+    /* Section Styles */
+    .section-title {
+      font-weight: 700;
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      color: var(--primary-red);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .section-dark {
+      background: var(--darker-bg);
+    }
+
+    .section-light {
+      background: var(--dark-bg);
+    }
+
+    /* Countdown */
+    .countdown {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      margin-top: -100px;
+    }
+
+    .countdown .time {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .countdown-number {
+      font-size: 4rem;
+      font-weight: 700;
+      color: var(--primary-red);
+      padding: 20px 30px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, rgba(218, 2, 14, 0.1), rgba(184, 0, 26, 0.1));
+      border: 2px solid var(--primary-red);
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+      text-shadow: 0 0 10px rgba(218, 2, 14, 0.5);
+    }
+
+    .countdown-number::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .countdown .time small {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      color: var(--text-light);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    /* Features */
+    .features-section .col-md-4 {
+      margin-bottom: 2rem;
+    }
+
+    .features-section i {
+      color: var(--primary-red);
+      margin-bottom: 1rem;
+    }
+
+    .features-section h4 {
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    /* Stats */
+    .stats-section {
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+    }
+
+    .stats-section h2 {
+      color: white;
+      font-size: 4rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .stats-section p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(45deg, var(--primary-red), var(--dark-red));
+      border: none;
+      padding: 12px 30px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      border-radius: 25px;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(45deg, var(--dark-red), var(--primary-red));
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(218, 2, 14, 0.4);
+    }
+
+    /* FAQ */
+    .accordion-item {
+      background: var(--darker-bg);
+      border: 1px solid var(--primary-red);
+      border-radius: 10px !important;
+      margin-bottom: 15px;
+      overflow: hidden;
+    }
+
+    .accordion-button {
+      background: var(--darker-bg);
+      color: var(--text-light);
+      font-weight: 600;
+      border: none;
+      padding: 1.5rem;
+    }
+
+    .accordion-button:not(.collapsed) {
+      background: var(--primary-red);
+      color: white;
+    }
+
+    .accordion-button:focus {
+      box-shadow: none;
+      border: none;
+    }
+
+    .accordion-body {
+      background: var(--darker-bg);
+      color: var(--text-light);
+      border-top: 1px solid var(--primary-red);
+    }
+
+    /* Contact Form */
+    .form-control {
+      background: var(--darker-bg);
+      border: 2px solid var(--primary-red);
+      color: var(--text-light);
+      border-radius: 10px;
+    }
+
+    .form-control:focus {
+      background: var(--darker-bg);
+      border-color: var(--light-red);
+      color: var(--text-light);
+      box-shadow: 0 0 10px rgba(218, 2, 14, 0.3);
+    }
+
+    .form-label {
+      color: var(--text-light);
+      font-weight: 600;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--darker-bg);
+      border-top: 2px solid var(--primary-red);
+    }
+
+    footer a {
+      color: var(--primary-red);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    footer a:hover {
+      color: var(--light-red);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-section .caption h2 {
+        font-size: 2.5rem;
+      }
+      
+      .section-title {
+        font-size: 2rem;
+      }
+      
+      .countdown-number {
+        font-size: 2.5rem;
+        padding: 15px 20px;
+      }
+    }
+
+    /* Modal */
+    .modal-content {
+      background: var(--darker-bg);
+      border: 2px solid var(--primary-red);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid var(--primary-red);
+    }
+
+    .modal-title {
+      color: var(--primary-red);
+    }
+
+    .btn-close {
+      filter: invert(1);
+    }
+  </style>
+
+  <style>
+    .helpus-wrap { max-width: 720px; margin: 0 auto; padding: 120px 20px 80px; }
+    .helpus-head { text-align: center; margin-bottom: 2.5rem; }
+    .helpus-head .badge-soon {
+      display:inline-block; font-size:0.8rem; font-weight:600; letter-spacing:2px;
+      text-transform:uppercase; color:var(--gold); border:1px solid var(--primary-red);
+      border-radius:25px; padding:5px 16px; margin-bottom:1.2rem;
+    }
+    .helpus-head h1 { font-size:3rem; font-weight:700; color:var(--primary-red); text-shadow:2px 2px 4px rgba(0,0,0,0.5); margin-bottom:0.6rem; }
+    .helpus-head p { font-size:1.1rem; color:var(--text-light); }
+
+    .card-block {
+      background: var(--darker-bg); border:1px solid var(--primary-red);
+      border-radius:14px; padding:2rem; margin-bottom:1.5rem;
+    }
+    .card-block h3 { color:var(--gold); font-weight:700; margin-bottom:1rem; font-size:1.3rem; }
+
+    /* Discord login button */
+    .discord-btn {
+      display:inline-flex; align-items:center; gap:0.6rem; background:#5865F2; color:#fff;
+      border:none; padding:12px 26px; border-radius:25px; font-weight:600; font-size:1rem;
+      cursor:pointer; transition:all 0.3s ease; text-transform:uppercase; letter-spacing:1px;
+    }
+    .discord-btn:hover { background:#4752c4; transform:translateY(-2px); box-shadow:0 8px 20px rgba(88,101,242,0.4); }
+    .discord-btn i { font-size:1.3rem; }
+
+    .user-chip {
+      display:inline-flex; align-items:center; gap:0.7rem; background:rgba(88,101,242,0.12);
+      border:1px solid #5865F2; border-radius:30px; padding:6px 16px 6px 6px; color:var(--text-light);
+    }
+    .user-chip img { width:34px; height:34px; border-radius:50%; }
+    .user-chip .uname { font-weight:600; }
+    .logout-link { background:none; border:none; color:var(--primary-red); cursor:pointer; font-size:0.85rem; font-weight:600; margin-left:0.4rem; }
+
+    /* upload area */
+    .drop-zone {
+      border:2px dashed var(--primary-red); border-radius:12px; padding:2.5rem 1.5rem;
+      text-align:center; cursor:pointer; transition:all 0.3s ease; background:rgba(218,2,14,0.04);
+    }
+    .drop-zone:hover, .drop-zone.dragover { background:rgba(218,2,14,0.1); border-color:var(--light-red); }
+    .drop-zone i { font-size:2.5rem; color:var(--primary-red); margin-bottom:0.8rem; }
+    .drop-zone p { color:var(--text-light); margin-bottom:0.3rem; }
+    .drop-zone small { color:#aaa; }
+    .drop-zone input[type=file] { display:none; }
+
+    .file-row {
+      display:flex; align-items:center; justify-content:space-between; gap:1rem;
+      background:var(--dark-bg); border:1px solid #333; border-radius:8px;
+      padding:0.7rem 1rem; margin-top:0.7rem;
+    }
+    .file-row .fname { color:var(--text-light); word-break:break-all; font-size:0.9rem; }
+    .file-row .remove { background:none; border:none; color:var(--primary-red); cursor:pointer; font-size:1.1rem; }
+
+    .form-control, .form-control:focus {
+      background: var(--dark-bg); border:2px solid var(--primary-red); color:var(--text-light); border-radius:10px;
+    }
+    .form-control:focus { border-color:var(--light-red); box-shadow:0 0 10px rgba(218,2,14,0.3); }
+    .form-label { color:var(--text-light); font-weight:600; }
+
+    .locked-note { color:#aaa; text-align:center; padding:1rem; }
+    .status-msg { margin-top:1rem; padding:0.9rem 1.1rem; border-radius:8px; display:none; }
+    .status-msg.ok { display:block; background:rgba(34,197,94,0.1); border:1px solid #22c55e; color:#8ef0ad; }
+    .status-msg.err { display:block; background:rgba(218,2,14,0.1); border:1px solid var(--primary-red); color:#ff8b93; }
+    .status-msg.info { display:block; background:rgba(255,215,0,0.08); border:1px solid var(--gold); color:#ffe680; }
+
+    .hidden { display:none !important; }
+    @media (max-width:768px){ .helpus-head h1 { font-size:2.1rem; } }
+  </style>
+  <script>
+    // ============================================================
+    //  CONFIG  — replace these 3 placeholder values with your own
+    // ============================================================
+    const DISCORD_CLIENT_ID = "1520050731862851664";                       // Developer Portal > General Information > Application ID
+    const REDIRECT_URI       = "https://eshortx.github.io/help-us.html";   // must match the Portal redirect exactly (lowercase)
+    const WORKER_URL         = "https://gleuplode.sulmmant5.workers.dev";  // the relay that holds your webhook
+    // ============================================================
+
+    const OAUTH_SCOPE = "identify";
+    const STORAGE_KEY = "gle_discord_user";
+  </script>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a class="navbar-brand" href="index.html">
+        <img src="https://cdn.discordapp.com/attachments/1306360339616759910/1414590908325957652/main_icon_-_eshort.png?ex=6998feb2&is=6997ad32&hm=72bb3439304c3741d5cf4aa8d7e2114c05453331fd0fd31e0c6f4f8568258518" alt="GLE MOD Logo">
+      </a>
+      <div class="social-icons d-none d-lg-flex">
+        <a href="https://www.youtube.com/@Eshortx/featured" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="https://discord.com/invite/YwH4zXcvaZ" target="_blank"><i class="fab fa-discord"></i></a>
+      </div>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Menu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-center flex-grow-1 pe-3">
+            <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#features">Features</a></li>
+            <li class="nav-item"><a class="nav-link" href="database.html">Database</a></li>
+            <li class="nav-item"><a class="nav-link active" href="help-us.html">Help Us</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="helpus-wrap">
+    <div class="helpus-head">
+      <span class="badge-soon">Community Contributions</span>
+      <h1>Help Us</h1>
+      <p>Log in with Discord and upload your files. We'll review every submission &mdash; and we can reach you on Discord if we have questions.</p>
+    </div>
+
+    <!-- LOGIN GATE -->
+    <div class="card-block" id="login-card">
+      <h3><i class="fab fa-discord" style="color:#5865F2"></i> Step 1 &mdash; Sign in</h3>
+      <p style="color:#ccc; margin-bottom:1.3rem">You must sign in with your Discord account before uploading. This lets us credit you and contact you about your submission.</p>
+      <button class="discord-btn" id="login-btn"><i class="fab fa-discord"></i> Login with Discord</button>
+      <div class="status-msg" id="login-status"></div>
+    </div>
+
+    <!-- LOGGED-IN STATE -->
+    <div id="logged-in" class="hidden">
+      <div class="card-block">
+        <h3>Signed in</h3>
+        <div class="user-chip">
+          <img id="u-avatar" src="" alt="avatar">
+          <span class="uname" id="u-name">username</span>
+          <button class="logout-link" id="logout-btn">Log out</button>
+        </div>
+      </div>
+
+      <!-- UPLOAD -->
+      <div class="card-block">
+        <h3>Step 2 &mdash; Your files</h3>
+        <div class="mb-3">
+          <label class="form-label">What are you submitting? (optional note)</label>
+          <textarea class="form-control" id="note" rows="2" placeholder="e.g. Updated Liverpool kit pack"></textarea>
+        </div>
+        <div class="drop-zone" id="drop-zone">
+          <i class="fas fa-cloud-arrow-up"></i>
+          <p><strong>Click to choose files</strong> or drag &amp; drop</p>
+          <small>Max 8 MB per file (Discord limit)</small>
+          <input type="file" id="file-input" multiple>
+        </div>
+        <div id="file-list"></div>
+        <button class="btn btn-primary btn-lg mt-3 w-100" id="submit-btn" disabled>Submit Files</button>
+        <div class="status-msg" id="upload-status"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-4 text-center">
+    <div class="container">
+      <p class="mb-1">&copy; 2026 GLE MOD. All rights reserved.</p>
+      <p class="mb-0"></p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script>
+  // ============================================================
+  //  DISCORD LOGIN  (implicit OAuth2 — no backend, no secret)
+  // ============================================================
+  const $ = id => document.getElementById(id);
+
+  function loginUrl() {
+    const p = new URLSearchParams({
+      client_id: DISCORD_CLIENT_ID,
+      redirect_uri: REDIRECT_URI,
+      response_type: "token",
+      scope: OAUTH_SCOPE
+    });
+    return "https://discord.com/oauth2/authorize?" + p.toString();
+  }
+
+  // After Discord redirects back, the token is in the URL hash: #access_token=...&token_type=Bearer...
+  function readTokenFromHash() {
+    if (!location.hash || location.hash.length < 2) return null;
+    const h = new URLSearchParams(location.hash.slice(1));
+    const token = h.get("access_token");
+    if (!token) return null;
+    // clean the token out of the address bar
+    history.replaceState(null, "", location.pathname + location.search);
+    return token;
+  }
+
+  async function fetchDiscordUser(token) {
+    const r = await fetch("https://discord.com/api/users/@me", {
+      headers: { Authorization: "Bearer " + token }
+    });
+    if (!r.ok) throw new Error("Could not read Discord profile");
+    return r.json();
+  }
+
+  function avatarUrl(u) {
+    if (u.avatar) return `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`;
+    const idx = (BigInt(u.id) >> 22n) % 6n;
+    return `https://cdn.discordapp.com/embed/avatars/${idx}.png`;
+  }
+
+  function displayName(u) {
+    // new Discord usernames have no discriminator; old ones do
+    return (u.discriminator && u.discriminator !== "0") ? `${u.username}#${u.discriminator}` : u.username;
+  }
+
+  function showLoggedIn(u) {
+    $("login-card").classList.add("hidden");
+    $("logged-in").classList.remove("hidden");
+    $("u-name").textContent = displayName(u);
+    $("u-avatar").src = avatarUrl(u);
+  }
+
+  function showLoggedOut() {
+    $("logged-in").classList.add("hidden");
+    $("login-card").classList.remove("hidden");
+  }
+
+  function saveUser(u) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      id: u.id, username: u.username, discriminator: u.discriminator,
+      global_name: u.global_name, avatar: u.avatar, display: displayName(u)
+    }));
+  }
+  function loadUser() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e){ return null; }
+  }
+
+  let currentUser = null;
+
+  async function init() {
+    const token = readTokenFromHash();
+    if (token) {
+      try {
+        const u = await fetchDiscordUser(token);
+        saveUser(u);
+        currentUser = u;
+        showLoggedIn(u);
+        return;
+      } catch (e) {
+        setStatus("login-status", "err", "Login failed: " + e.message + ". Please try again.");
+      }
+    }
+    const saved = loadUser();
+    if (saved) { currentUser = saved; showLoggedIn(saved); }
+    else showLoggedOut();
+  }
+
+  $("login-btn").addEventListener("click", () => {
+    if (DISCORD_CLIENT_ID.startsWith("YOUR_")) {
+      setStatus("login-status", "err", "Setup not finished: add your Discord Client ID and Redirect URL in the config.");
+      return;
+    }
+    location.href = loginUrl();
+  });
+
+  $("logout-btn").addEventListener("click", () => {
+    localStorage.removeItem(STORAGE_KEY);
+    currentUser = null;
+    files = [];
+    renderFiles();
+    showLoggedOut();
+  });
+
+  // ============================================================
+  //  FILE UPLOAD  (sent through the Cloudflare Worker relay)
+  // ============================================================
+  let files = [];
+  const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
+
+  const dz = $("drop-zone"), fi = $("file-input");
+  dz.addEventListener("click", () => fi.click());
+  dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("dragover"); });
+  dz.addEventListener("dragleave", () => dz.classList.remove("dragover"));
+  dz.addEventListener("drop", e => {
+    e.preventDefault(); dz.classList.remove("dragover");
+    addFiles(e.dataTransfer.files);
+  });
+  fi.addEventListener("change", () => addFiles(fi.files));
+
+  function addFiles(list) {
+    for (const f of list) {
+      if (f.size > MAX_BYTES) {
+        setStatus("upload-status", "err", `"${f.name}" is over 8 MB and was skipped.`);
+        continue;
+      }
+      files.push(f);
+    }
+    fi.value = "";
+    renderFiles();
+  }
+
+  function renderFiles() {
+    const wrap = $("file-list");
+    wrap.innerHTML = "";
+    files.forEach((f, i) => {
+      const row = document.createElement("div");
+      row.className = "file-row";
+      row.innerHTML = `<span class="fname"><i class="fas fa-file" style="color:var(--gold);margin-right:.5rem"></i>${f.name} <small style="color:#888">(${(f.size/1024/1024).toFixed(2)} MB)</small></span>`;
+      const btn = document.createElement("button");
+      btn.className = "remove"; btn.innerHTML = "&times;";
+      btn.onclick = () => { files.splice(i,1); renderFiles(); };
+      row.appendChild(btn);
+      wrap.appendChild(row);
+    });
+    $("submit-btn").disabled = files.length === 0;
+  }
+
+  function setStatus(id, type, msg) {
+    const el = $(id);
+    el.className = "status-msg " + type;
+    el.textContent = msg;
+  }
+
+  $("submit-btn").addEventListener("click", async () => {
+    if (!currentUser) { setStatus("upload-status","err","Please log in first."); return; }
+    if (!files.length) return;
+    if (WORKER_URL.startsWith("YOUR_")) {
+      setStatus("upload-status","err","Setup not finished: add your Cloudflare Worker URL in the config.");
+      return;
+    }
+
+    $("submit-btn").disabled = true;
+    setStatus("upload-status","info","Uploading…");
+
+    const note = $("note").value.trim();
+    const who = currentUser.display || displayName(currentUser);
+    const header = `**New submission**\nFrom: **${who}** (ID: \`${currentUser.id}\`)` + (note ? `\nNote: ${note}` : "");
+
+    try {
+      // one request per file (each Discord message carries its files)
+      let first = true;
+      for (let i = 0; i < files.length; i += 10) {
+        const batch = files.slice(i, i + 10);
+        const fd = new FormData();
+        fd.append("payload_json", JSON.stringify({
+          content: first ? header : `(more files from **${who}**)`,
+          username: "GLE MOD Uploads"
+        }));
+        batch.forEach((f, j) => fd.append("files[" + j + "]", f, f.name));
+        const r = await fetch(WORKER_URL, { method: "POST", body: fd });
+        if (!r.ok) throw new Error("Server returned " + r.status);
+        first = false;
+      }
+      files = [];
+      renderFiles();
+      $("note").value = "";
+      setStatus("upload-status","ok","✅ Thank you! Your files were submitted. We'll reach out on Discord if we need anything.");
+    } catch (e) {
+      setStatus("upload-status","err","Upload failed: " + e.message + ". Please try again or contact us on Discord.");
+      $("submit-btn").disabled = false;
+    }
+  });
+
+  init();
+  </script>
+</body>
+</html>
