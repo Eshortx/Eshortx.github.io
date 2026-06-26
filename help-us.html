@@ -458,6 +458,33 @@
       background:var(--dark-bg); cursor:pointer; padding:3px;
     }
     .form-control.err { border-color:#ff3b3b !important; box-shadow:0 0 8px rgba(255,59,59,.4); }
+
+    /* stepper */
+    .stepper { display:flex; align-items:center; justify-content:center; gap:.4rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+    .stepper .dot {
+      display:flex; align-items:center; gap:.45rem; font-size:.78rem; color:#888; font-weight:600;
+    }
+    .stepper .dot .num {
+      width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      background:#2a2a2a; border:1px solid #444; font-size:.8rem; transition:all .25s;
+    }
+    .stepper .dot.active .num { background:var(--primary-red); border-color:var(--primary-red); color:#fff; }
+    .stepper .dot.done .num { background:#22c55e; border-color:#22c55e; color:#fff; }
+    .stepper .dot.active { color:var(--text-light); }
+    .stepper .sep { width:18px; height:2px; background:#333; }
+    @media (max-width:768px){ .stepper .dlabel { display:none; } }
+
+    .step-pane { display:none; animation:fadeUp .25s ease; }
+    .step-pane.active { display:block; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+    .step-nav { display:flex; justify-content:space-between; gap:1rem; margin-top:1.5rem; }
+    .review-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem 1.5rem; }
+    .review-grid .lbl { color:#888; font-size:.85rem; }
+    .review-grid .val { color:#fff; font-weight:600; word-break:break-all; }
+    .review-swatch { display:inline-block; width:16px; height:16px; border-radius:4px; border:1px solid #555; vertical-align:middle; margin-right:4px; }
+    @media (max-width:768px){ .review-grid { grid-template-columns:1fr; } }
+
     @media (max-width:768px){ .helpus-head h1 { font-size:2.1rem; } }
   </style>
   <script>
@@ -521,139 +548,188 @@
 
     <!-- LOGGED-IN STATE -->
     <div id="logged-in" class="hidden">
-      <div class="card-block">
-        <h3>Signed in</h3>
+      <div class="card-block" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
         <div class="user-chip">
           <img id="u-avatar" src="" alt="avatar">
           <span class="uname" id="u-name">username</span>
-          <button class="logout-link" id="logout-btn">Log out</button>
         </div>
+        <button class="logout-link" id="logout-btn">Log out</button>
       </div>
 
-      <!-- TEAM SELECTION -->
-      <div class="card-block">
-        <h3>Step 2 &mdash; League &amp; Team</h3>
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">League <span style="color:var(--primary-red)">*</span></label>
-            <input class="form-control" id="f-league" placeholder="e.g. Premier League">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Team <span style="color:var(--primary-red)">*</span></label>
-            <input class="form-control" id="f-team" placeholder="e.g. Liverpool">
-          </div>
-        </div>
-      </div>
+      <!-- progress -->
+      <div class="stepper" id="stepper"></div>
 
-      <!-- TEAM DATA -->
-      <div class="card-block">
-        <h3>Step 3 &mdash; Team Data <small style="color:#888;font-size:.8rem;font-weight:400">(required)</small></h3>
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Stadium name <span class="rq">*</span></label>
-            <input class="form-control" id="f-stadium" placeholder="e.g. Anfield">
+      <!-- STEP 1: League & Team -->
+      <div class="step-pane active" data-step="1">
+        <div class="card-block">
+          <h3>League &amp; Team</h3>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">League <span class="rq">*</span></label>
+              <input class="form-control" id="f-league" placeholder="e.g. Premier League">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Team <span class="rq">*</span></label>
+              <input class="form-control" id="f-team" placeholder="e.g. Liverpool">
+            </div>
           </div>
-          <div class="col-md-6">
-            <label class="form-label">Realistic team budget (£M) <span class="rq">*</span></label>
-            <input class="form-control" type="number" min="0" id="f-budget" placeholder="e.g. 150">
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">League titles won <span class="rq">*</span></label>
-            <input class="form-control" type="number" min="0" id="f-league-titles" placeholder="0">
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">Domestic cups won <span class="rq">*</span></label>
-            <input class="form-control" type="number" min="0" id="f-domestic-cups" placeholder="0">
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">International cups won <span class="rq">*</span></label>
-            <input class="form-control" type="number" min="0" id="f-intl-cups" placeholder="0">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Goal-scoring record <span class="rq">*</span></label>
-            <input class="form-control" type="number" min="0" id="f-goal-record" placeholder="e.g. 36">
+          <div class="step-nav">
+            <span></span>
+            <button class="btn btn-primary" onclick="nextStep()">Continue &rarr;</button>
           </div>
         </div>
       </div>
 
-      <!-- LOCATION -->
-      <div class="card-block">
-        <h3>Step 4 &mdash; Team Location <small style="color:#888;font-size:.8rem;font-weight:400">(required)</small></h3>
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Latitude <span class="rq">*</span></label>
-            <input class="form-control" type="number" step="any" id="f-lat" placeholder="e.g. 53.4308">
+      <!-- STEP 2: Team Data -->
+      <div class="step-pane" data-step="2">
+        <div class="card-block">
+          <h3>Team Data <small style="color:#888;font-size:.8rem;font-weight:400">(required)</small></h3>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Stadium name <span class="rq">*</span></label>
+              <input class="form-control" id="f-stadium" placeholder="e.g. Anfield">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Realistic team budget (£M) <span class="rq">*</span></label>
+              <input class="form-control" type="number" min="0" id="f-budget" placeholder="e.g. 150">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">League titles won <span class="rq">*</span></label>
+              <input class="form-control" type="number" min="0" id="f-league-titles" placeholder="0">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Domestic cups won <span class="rq">*</span></label>
+              <input class="form-control" type="number" min="0" id="f-domestic-cups" placeholder="0">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">International cups won <span class="rq">*</span></label>
+              <input class="form-control" type="number" min="0" id="f-intl-cups" placeholder="0">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Goal-scoring record <span class="rq">*</span></label>
+              <input class="form-control" type="number" min="0" id="f-goal-record" placeholder="e.g. 36">
+            </div>
           </div>
-          <div class="col-md-6">
-            <label class="form-label">Longitude <span class="rq">*</span></label>
-            <input class="form-control" type="number" step="any" id="f-lng" placeholder="e.g. -2.9608">
-          </div>
-        </div>
-        <small style="color:#888">Tip: right-click a spot in Google Maps to copy its coordinates.</small>
-      </div>
-
-      <!-- TEAM COLORS -->
-      <div class="card-block">
-        <h3>Step 5 &mdash; Team Colors <small style="color:#888;font-size:.8rem;font-weight:400">(required)</small></h3>
-        <div class="row g-3">
-          <div class="col-md-4 color-field">
-            <label class="form-label">Primary <span class="rq">*</span></label>
-            <input type="color" id="f-c1" value="#c8102e">
-          </div>
-          <div class="col-md-4 color-field">
-            <label class="form-label">Secondary <span class="rq">*</span></label>
-            <input type="color" id="f-c2" value="#00b2a9">
-          </div>
-          <div class="col-md-4 color-field">
-            <label class="form-label">Third <span class="rq">*</span></label>
-            <input type="color" id="f-c3" value="#f6eb61">
-          </div>
-        </div>
-      </div>
-
-      <!-- LEAGUE DATA -->
-      <div class="card-block">
-        <h3>Step 6 &mdash; League Data <small style="color:#888;font-size:.8rem;font-weight:400">(required)</small></h3>
-        <div class="row g-3">
-          <div class="col-md-3 color-field">
-            <label class="form-label">Comp. color 1 <span class="rq">*</span></label>
-            <input type="color" id="f-lc1" value="#3d195b">
-          </div>
-          <div class="col-md-3 color-field">
-            <label class="form-label">Comp. color 2 <span class="rq">*</span></label>
-            <input type="color" id="f-lc2" value="#00ff87">
-          </div>
-          <div class="col-md-3 color-field">
-            <label class="form-label">Comp. color 3 <span class="rq">*</span></label>
-            <input type="color" id="f-lc3" value="#ffffff">
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">League goal record <span class="rq">*</span></label>
-            <input class="form-control" type="number" min="0" id="f-league-goal" placeholder="e.g. 36">
+          <div class="step-nav">
+            <button class="btn btn-secondary" onclick="prevStep()">&larr; Back</button>
+            <button class="btn btn-primary" onclick="nextStep()">Continue &rarr;</button>
           </div>
         </div>
       </div>
 
-      <!-- UPLOAD -->
-      <div class="card-block">
-        <h3>Step 7 &mdash; Visual Assets <small style="color:#888;font-size:.8rem;font-weight:400">(optional)</small></h3>
-        <p style="color:#bbb;font-size:.9rem;margin-bottom:1rem">
-          Optional: banner, scarf, adboard, flag, kits (home / away / GK / extra), league adboard.
-          Leave empty if you don't have them &mdash; you can add them in a later submission.
-        </p>
-        <div class="mb-3">
-          <label class="form-label">Note (optional)</label>
-          <textarea class="form-control" id="note" rows="2" placeholder="e.g. Home + away kits only, banner still needed"></textarea>
+      <!-- STEP 3: Location -->
+      <div class="step-pane" data-step="3">
+        <div class="card-block">
+          <h3>Team Location <small style="color:#888;font-size:.8rem;font-weight:400">(required)</small></h3>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Latitude <span class="rq">*</span></label>
+              <input class="form-control" type="number" step="any" id="f-lat" placeholder="e.g. 53.4308">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Longitude <span class="rq">*</span></label>
+              <input class="form-control" type="number" step="any" id="f-lng" placeholder="e.g. -2.9608">
+            </div>
+          </div>
+          <small style="color:#888">Tip: right-click a spot in Google Maps to copy its coordinates.</small>
+          <div class="step-nav">
+            <button class="btn btn-secondary" onclick="prevStep()">&larr; Back</button>
+            <button class="btn btn-primary" onclick="nextStep()">Continue &rarr;</button>
+          </div>
         </div>
-        <div class="drop-zone" id="drop-zone">
-          <i class="fas fa-cloud-arrow-up"></i>
-          <p><strong>Click to choose files</strong> or drag &amp; drop</p>
-          <small>Any size welcome — large files are split automatically</small>
-          <input type="file" id="file-input" multiple>
+      </div>
+
+      <!-- STEP 4: Team Colors -->
+      <div class="step-pane" data-step="4">
+        <div class="card-block">
+          <h3>Team Colors <small style="color:#888;font-size:.8rem;font-weight:400">(required)</small></h3>
+          <div class="row g-3">
+            <div class="col-md-4 color-field">
+              <label class="form-label">Primary <span class="rq">*</span></label>
+              <input type="color" id="f-c1" value="#c8102e">
+            </div>
+            <div class="col-md-4 color-field">
+              <label class="form-label">Secondary <span class="rq">*</span></label>
+              <input type="color" id="f-c2" value="#00b2a9">
+            </div>
+            <div class="col-md-4 color-field">
+              <label class="form-label">Third <span class="rq">*</span></label>
+              <input type="color" id="f-c3" value="#f6eb61">
+            </div>
+          </div>
+          <div class="step-nav">
+            <button class="btn btn-secondary" onclick="prevStep()">&larr; Back</button>
+            <button class="btn btn-primary" onclick="nextStep()">Continue &rarr;</button>
+          </div>
         </div>
-        <div id="file-list"></div>
-        <button class="btn btn-primary btn-lg mt-3 w-100" id="submit-btn" disabled>Submit to GLE MOD</button>
-        <div class="status-msg" id="upload-status"></div>
+      </div>
+
+      <!-- STEP 5: League Data -->
+      <div class="step-pane" data-step="5">
+        <div class="card-block">
+          <h3>League Data <small style="color:#888;font-size:.8rem;font-weight:400">(required)</small></h3>
+          <div class="row g-3">
+            <div class="col-md-3 color-field">
+              <label class="form-label">Comp. color 1 <span class="rq">*</span></label>
+              <input type="color" id="f-lc1" value="#3d195b">
+            </div>
+            <div class="col-md-3 color-field">
+              <label class="form-label">Comp. color 2 <span class="rq">*</span></label>
+              <input type="color" id="f-lc2" value="#00ff87">
+            </div>
+            <div class="col-md-3 color-field">
+              <label class="form-label">Comp. color 3 <span class="rq">*</span></label>
+              <input type="color" id="f-lc3" value="#ffffff">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">League goal record <span class="rq">*</span></label>
+              <input class="form-control" type="number" min="0" id="f-league-goal" placeholder="e.g. 36">
+            </div>
+          </div>
+          <div class="step-nav">
+            <button class="btn btn-secondary" onclick="prevStep()">&larr; Back</button>
+            <button class="btn btn-primary" onclick="nextStep()">Continue &rarr;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6: Visual Assets -->
+      <div class="step-pane" data-step="6">
+        <div class="card-block">
+          <h3>Visual Assets <small style="color:#888;font-size:.8rem;font-weight:400">(optional)</small></h3>
+          <p style="color:#bbb;font-size:.9rem;margin-bottom:1rem">
+            Optional: banner, scarf, adboard, flag, kits (home / away / GK / extra), league adboard.
+            Leave empty if you don't have them &mdash; you can add them in a later submission.
+          </p>
+          <div class="mb-3">
+            <label class="form-label">Note (optional)</label>
+            <textarea class="form-control" id="note" rows="2" placeholder="e.g. Home + away kits only, banner still needed"></textarea>
+          </div>
+          <div class="drop-zone" id="drop-zone">
+            <i class="fas fa-cloud-arrow-up"></i>
+            <p><strong>Click to choose files</strong> or drag &amp; drop</p>
+            <small>Any size welcome — large files are split automatically</small>
+            <input type="file" id="file-input" multiple>
+          </div>
+          <div id="file-list"></div>
+          <div class="step-nav">
+            <button class="btn btn-secondary" onclick="prevStep()">&larr; Back</button>
+            <button class="btn btn-primary" onclick="nextStep()">Review &rarr;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 7: Review -->
+      <div class="step-pane" data-step="7">
+        <div class="card-block">
+          <h3>Review &amp; Submit</h3>
+          <div id="review-box" class="review-grid"></div>
+          <div class="status-msg" id="upload-status"></div>
+          <div class="step-nav">
+            <button class="btn btn-secondary" onclick="prevStep()">&larr; Back</button>
+            <button class="btn btn-primary btn-lg" id="submit-btn">Submit to GLE MOD</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -718,7 +794,7 @@
     $("logged-in").classList.remove("hidden");
     $("u-name").textContent = displayName(u);
     $("u-avatar").src = avatarUrl(u);
-    $("submit-btn").disabled = false;
+    goToStep(1);
   }
 
   function showLoggedOut() {
@@ -840,6 +916,97 @@
   }
 
   // Required fields: id -> label. Colors always have a value so aren't checked.
+  // ============================================================
+  //  STEP NAVIGATION
+  // ============================================================
+  const STEPS = [
+    { n:1, label:"Team" },
+    { n:2, label:"Data" },
+    { n:3, label:"Location" },
+    { n:4, label:"Colors" },
+    { n:5, label:"League" },
+    { n:6, label:"Assets" },
+    { n:7, label:"Review" },
+  ];
+  // required field ids per step (for per-step validation)
+  const STEP_FIELDS = {
+    1: ["f-league","f-team"],
+    2: ["f-stadium","f-budget","f-league-titles","f-domestic-cups","f-intl-cups","f-goal-record"],
+    3: ["f-lat","f-lng"],
+    4: [], // colors always have a value
+    5: ["f-league-goal"],
+    6: [], // assets optional
+  };
+  let currentStep = 1;
+
+  function renderStepper() {
+    let html = "";
+    STEPS.forEach((s, i) => {
+      let cls = "dot";
+      if (s.n === currentStep) cls += " active";
+      else if (s.n < currentStep) cls += " done";
+      const inner = s.n < currentStep ? "✓" : s.n;
+      html += `<div class="${cls}"><span class="num">${inner}</span><span class="dlabel">${s.label}</span></div>`;
+      if (i < STEPS.length - 1) html += `<span class="sep"></span>`;
+    });
+    document.getElementById("stepper").innerHTML = html;
+  }
+
+  function showStep(n) {
+    document.querySelectorAll(".step-pane").forEach(p => {
+      p.classList.toggle("active", +p.dataset.step === n);
+    });
+    currentStep = n;
+    renderStepper();
+    if (n === 7) renderReview();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  window.goToStep = showStep;
+
+  function validateStep(n) {
+    const ids = STEP_FIELDS[n] || [];
+    const missing = [];
+    ids.forEach(id => {
+      const el = $(id);
+      const empty = el.value.trim() === "";
+      el.classList.toggle("err", empty);
+      if (empty) missing.push(el.previousElementSibling ? el.previousElementSibling.textContent.replace("*","").trim() : id);
+    });
+    return missing;
+  }
+
+  window.nextStep = function() {
+    const miss = validateStep(currentStep);
+    if (miss.length) {
+      alert("Please fill in: " + miss.join(", "));
+      return;
+    }
+    if (currentStep < 7) showStep(currentStep + 1);
+  };
+  window.prevStep = function() {
+    if (currentStep > 1) showStep(currentStep - 1);
+  };
+
+  function renderReview() {
+    const d = collectData();
+    const sw = c => `<span class="review-swatch" style="background:${c}"></span>${c}`;
+    const rows = [
+      ["League", d.league], ["Team", d.team],
+      ["Stadium", d.teamData.stadium], ["Budget", "£" + d.teamData.budgetMillions + "M"],
+      ["League titles", d.teamData.leagueTitles], ["Domestic cups", d.teamData.domesticCups],
+      ["International cups", d.teamData.intlCups], ["Goal record", d.teamData.goalRecord],
+      ["Location", d.location.lat + ", " + d.location.lng],
+      ["Team colors", sw(d.teamColors.primary)+" "+sw(d.teamColors.secondary)+" "+sw(d.teamColors.third)],
+      ["League colors", sw(d.leagueData.color1)+" "+sw(d.leagueData.color2)+" "+sw(d.leagueData.color3)],
+      ["League goal record", d.leagueData.goalRecord],
+      ["Note", d.note || "—"],
+      ["Assets attached", d.assetFiles.length ? d.assetFiles.length + " file(s)" : "none"],
+    ];
+    document.getElementById("review-box").innerHTML = rows.map(
+      ([l,v]) => `<div class="lbl">${l}</div><div class="val">${v}</div>`
+    ).join("");
+  }
+
   const REQUIRED = {
     "f-league":"League", "f-team":"Team",
     "f-stadium":"Stadium name", "f-budget":"Team budget",
